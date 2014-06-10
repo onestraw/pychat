@@ -1,0 +1,201 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'main.ui'
+#
+# Created: Mon Apr 21 21:25:51 2014
+#      by: PyQt4 UI code generator 4.10.3
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt4 import QtCore, QtGui
+
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    def _fromUtf8(s):
+        return s
+
+try:
+    _encoding = QtGui.QApplication.UnicodeUTF8
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+except AttributeError:
+    def _translate(context, text, disambig):
+        return QtGui.QApplication.translate(context, text, disambig)
+
+class Ui_MainWindow(object):
+    def __init__(self, MainWindow):
+        MainWindow.setObjectName(_fromUtf8("MainWindow"))
+        MainWindow.setWindowModality(QtCore.Qt.NonModal)
+        MainWindow.setEnabled(True)
+        MainWindow.resize(300, 500)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
+        MainWindow.setSizePolicy(sizePolicy)
+        MainWindow.setMinimumSize(QtCore.QSize(300, 400))
+        MainWindow.setMaximumSize(QtCore.QSize(300, 500))
+        palette = QtGui.QPalette()
+        brush = QtGui.QBrush(QtGui.QColor(0, 85, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.WindowText, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(85, 170, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Window, brush)
+        brush = QtGui.QBrush(QtGui.QColor(0, 85, 0))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.WindowText, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(85, 170, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Window, brush)
+        brush = QtGui.QBrush(QtGui.QColor(120, 120, 120))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.WindowText, brush)
+        brush = QtGui.QBrush(QtGui.QColor(85, 170, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(85, 170, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
+        MainWindow.setPalette(palette)
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("Times New Roman"))
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        MainWindow.setFont(font)
+        MainWindow.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/pic/img/avatar.jpg")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
+        MainWindow.setAutoFillBackground(True)
+        self.centralwidget = QtGui.QWidget(MainWindow)
+        self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
+        self.tabWidget = QtGui.QTabWidget(self.centralwidget)
+        self.tabWidget.setGeometry(QtCore.QRect(0, 90, 300, 431))
+        palette = QtGui.QPalette()
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Light, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Window, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Light, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Window, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Light, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
+        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
+        brush.setStyle(QtCore.Qt.SolidPattern)
+        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
+        self.tabWidget.setPalette(palette)
+        self.tabWidget.setObjectName(_fromUtf8("tabWidget"))
+        self.tab_1 = QtGui.QWidget()
+        self.tab_1.setObjectName(_fromUtf8("tab_1"))
+        self.treeWidget = QtGui.QTreeWidget(self.tab_1)
+        self.treeWidget.setGeometry(QtCore.QRect(0, 0, 301, 341))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.treeWidget.setFont(font)
+        self.treeWidget.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
+        self.treeWidget.setObjectName(_fromUtf8("treeWidget"))
+        self.treeWidget.headerItem().setText(0, _fromUtf8("1"))
+        self.tabWidget.addTab(self.tab_1, _fromUtf8(""))
+        self.tab_2 = QtGui.QWidget()
+        self.tab_2.setObjectName(_fromUtf8("tab_2"))
+        self.label = QtGui.QLabel(self.tab_2)
+        self.label.setGeometry(QtCore.QRect(30, 40, 141, 21))
+        self.label.setObjectName(_fromUtf8("label"))
+        self.lineEdit = QtGui.QLineEdit(self.tab_2)
+        self.lineEdit.setGeometry(QtCore.QRect(30, 69, 231, 21))
+        self.lineEdit.setObjectName(_fromUtf8("lineEdit"))
+        self.pushButton_findfriend = QtGui.QPushButton(self.tab_2)
+        self.pushButton_findfriend.setGeometry(QtCore.QRect(30, 100, 101, 25))
+        self.pushButton_findfriend.setObjectName(_fromUtf8("pushButton_findfriend"))
+        self.label_3 = QtGui.QLabel(self.tab_2)
+        self.label_3.setGeometry(QtCore.QRect(30, 140, 231, 31))
+        self.label_3.setObjectName(_fromUtf8("label_3"))
+        self.pushButton_addfriend = QtGui.QPushButton(self.tab_2)
+        self.pushButton_addfriend.setGeometry(QtCore.QRect(170, 100, 91, 25))
+        self.pushButton_addfriend.setObjectName(_fromUtf8("pushButton_addfriend"))
+        self.tabWidget.addTab(self.tab_2, _fromUtf8(""))
+        self.tab_3 = QtGui.QWidget()
+        self.tab_3.setObjectName(_fromUtf8("tab_3"))
+        self.textBrowser = QtGui.QTextBrowser(self.tab_3)
+        self.textBrowser.setGeometry(QtCore.QRect(20, 20, 256, 192))
+        self.textBrowser.setObjectName(_fromUtf8("textBrowser"))
+        self.tabWidget.addTab(self.tab_3, _fromUtf8(""))
+        self.frame = QtGui.QFrame(self.centralwidget)
+        self.frame.setGeometry(QtCore.QRect(0, 0, 300, 90))
+        self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtGui.QFrame.Raised)
+        self.frame.setObjectName(_fromUtf8("frame"))
+        self.label_nickname = QtGui.QLabel(self.frame)
+        self.label_nickname.setGeometry(QtCore.QRect(110, 10, 181, 25))
+        self.label_nickname.setText(_fromUtf8(""))
+        self.label_nickname.setObjectName(_fromUtf8("label_nickname"))
+        self.label_1 = QtGui.QLabel(self.frame)
+        self.label_1.setGeometry(QtCore.QRect(2, 2, 84, 84))
+        self.label_1.setAutoFillBackground(True)
+        self.label_1.setText(_fromUtf8(""))
+        self.label_1.setPixmap(QtGui.QPixmap(_fromUtf8(":/pic/img/avatar.jpg")))
+        self.label_1.setScaledContents(True)
+        self.label_1.setObjectName(_fromUtf8("label_1"))
+        self.label_signature = QtGui.QLabel(self.frame)
+        self.label_signature.setGeometry(QtCore.QRect(120, 35, 171, 21))
+        self.label_signature.setObjectName(_fromUtf8("label_signature"))
+        MainWindow.setCentralWidget(self.centralwidget)
+        self.menubar = QtGui.QMenuBar(MainWindow)
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 300, 23))
+        self.menubar.setObjectName(_fromUtf8("menubar"))
+        MainWindow.setMenuBar(self.menubar)
+        self.statusbar = QtGui.QStatusBar(MainWindow)
+        self.statusbar.setObjectName(_fromUtf8("statusbar"))
+        MainWindow.setStatusBar(self.statusbar)
+
+        self.retranslateUi(MainWindow)
+        self.tabWidget.setCurrentIndex(0)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.MainWindow = MainWindow
+
+    def retranslateUi(self, MainWindow):
+        MainWindow.setWindowTitle(_translate("MainWindow", "OC", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_1), _translate("MainWindow", "好友列表", None))
+        self.label.setText(_translate("MainWindow", "查找好友，输入OC号:", None))
+        self.pushButton_findfriend.setText(_translate("MainWindow", "查找", None))
+        self.label_3.setText(_translate("MainWindow", "昵称：", None))
+        self.pushButton_addfriend.setText(_translate("MainWindow", "加为好友", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "查找", None))
+        self.textBrowser.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Times New Roman\'; font-size:10pt; font-weight:600; font-style:normal;\">\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" color:#0000ff;\">网络聊天工具OC（Online Chat）</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">功能</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:400;\">注册、登录、添加好友、上线通知、下线通知、文字聊天、文件上传、文件下载、离线消息</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">author：何晓位</p></body></html>", None))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "关于", None))
+        self.label_signature.setText(_translate("MainWindow", "Life is short, you need Python", None))
+
+import img_rc

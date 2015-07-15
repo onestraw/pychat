@@ -1,4 +1,9 @@
-﻿import sys
+﻿'''
+author: geeksword
+email: geeksword@163.com
+site: http://onestraw.net
+'''
+import sys
 import time
 import socket
 import struct

@@ -33,7 +33,7 @@ The server's default IP is 127.0.0.1.
 `offline message remind`   
 ![one](doc/p3.png)
 
-`recv offline file` 
+`recv offline file`  
 ![one](doc/p4.png)
 
 `server log`  

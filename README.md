@@ -1,7 +1,6 @@
-#pychat
-***
+# pychat
 
-###1.Introduction
+## Introduction
 pychat is a C/S structure chat tool with friendly UI.It supports
 
 - registration
@@ -12,17 +11,20 @@ pychat is a C/S structure chat tool with friendly UI.It supports
 - online/offline file transmission
 - online/offline remind
 
-###2.Dev
+## Todo
+- daemonize server
+- create pyqt4 install script
+
+## Dev
 
 - Python2.7
-- PyQt4
+- PyQt4 [install](https://riverbankcomputing.com/software/pyqt/download)
 
-
-###3.Deplyment
+## Deplyment
 
 The server's default IP is 127.0.0.1.
 
-###4.Screenshots
+## Screenshots
 
 `friend lists`  
 ![one](doc/p1.png)

@@ -6,6 +6,9 @@ clean_pyc:
 server:clean_pyc
 	$(PYTHON) server/server.py
 
+stop:
+	$(PYTHON) server/server.py --action stop
+
 client:clean_pyc
 	$(PYTHON) client/main.py
 

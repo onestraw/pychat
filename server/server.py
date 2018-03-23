@@ -6,7 +6,8 @@ import socket
 import select
 import Queue
 import struct
-from threading import Thread
+import argparse
+from daemon import Daemon
 
 import friends
 import login
@@ -27,19 +28,19 @@ def _strip(s):
     return s.strip('\x00')
 
 
-class Server(Thread):
-    def __init__(self, ip="", port=6677):
-        Thread.__init__(self)
+class Server(Daemon):
+    def __init__(self, pidfile, ip="", port=6677):
+        super(Server, self).__init__(pidfile)
         self.ip = ip
         self.port = port
         self.listenNum = 50
-        self.sock = self.newSocket()
         self.runFlag = 1
         self.onlineUser = []
         self.sessions = {}    # 这里保存的socket用于传输消息
         self.cmd_sock = {}    # 每个客户端用于接收推送消息的cmd socket
 
     def run(self):
+        self.sock = self.newSocket()
         inputs = [self.sock]
         outputs = []
         msgQueues = {}
@@ -268,10 +269,10 @@ class Server(Thread):
                 s.close()
                 del msgQueues[s]
 
-    def stop(self):
-        self.runFlag = 0
-        if self.sock:
-            self.sock.close()
+    # def stop(self):
+    #     self.runFlag = 0
+    #     if self.sock:
+    #         self.sock.close()
 
     def newSocket(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -282,9 +283,23 @@ class Server(Thread):
 
 
 if __name__ == '__main__':
-    try:
-        s = Server(IP, PORT)
+    parser = argparse.ArgumentParser(
+                description='pychat server')
+    parser.add_argument('--action', dest='action', default='start',
+                        help='start/stop (default: %(default)s)')
+    parser.add_argument('--pidfile', dest='pidfile',
+                        default='/var/run/pychat_server.pid',
+                        help='pidfile (default: %(default)s)')
+    parser.add_argument('--ip', dest='ip', default=IP,
+                        help='ip (default: %(default)s)')
+    parser.add_argument('--port', dest='port', default=PORT,
+                        help='port (default: %(default)s)')
+    args = parser.parse_args()
+
+    s = Server(args.pidfile, args.ip, args.port)
+    if args.action == 'start':
         s.start()
-    except KeyboardInterrupt:
+    elif args.action == 'stop':
         s.stop()
-        print("CTRL+Z/D, server end")
+    else:
+        raise Exception("arguments error")

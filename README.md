@@ -12,7 +12,7 @@ pychat is a C/S structure chat tool with friendly UI.It supports
 - online/offline remind
 
 ## Todo
-- daemonize server
+- format client/
 - create pyqt4 install script
 
 ## Dev

@@ -13,7 +13,7 @@ client:clean_pyc
 	$(PYTHON) client/main.py
 
 check:
-	flake8 client/
+	flake8 client/main.py client/net.py
 	flake8 server/
 
 deps:

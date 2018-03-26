@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import os
-import time
 from const import FILE_PATH, file_info
+from utils import curTime
 
 
 def file_path(fname):
     return os.path.join(FILE_PATH, fname)
 
 
-def curTime():
-    return time.strftime('%Y-%m-%d %X', time.localtime(time.time()))
-
-
-def recordFileInfo(sno, rno, fname):
+def recordFileInfo(send_uid, recv_uid, fname):
     fw = open(file_info, "a")
-    cont = u"{}\t{}\t{}\t{}\n".format(sno, rno, curTime(), fname)
+    cont = u"{}\t{}\t{}\t{}\n".format(send_uid, recv_uid, curTime(), fname)
     fw.write(cont)
     fw.close()
 
@@ -26,14 +22,14 @@ def write2file(fname, cont):
     fw.close()
 
 
-def getFileLists(sno, rno):
+def getFileLists(send_uid, recv_uid):
     ret = ""
     fr = open(file_info, "r")
     line = fr.readline()
     while len(line) > 2:
         fields = line.split('\t')
-        if (fields[0] == sno and fields[1] == rno) or \
-                (fields[1] == sno and fields[0] == rno):
+        if (fields[0] == send_uid and fields[1] == recv_uid) or \
+                (fields[1] == send_uid and fields[0] == recv_uid):
             ret = ret + "|" + fields[3]
         line = fr.readline()
     fr.close()

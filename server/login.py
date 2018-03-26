@@ -28,7 +28,7 @@ def register(email, nickname, pwd):
     users[user_no] = [email, nickname, pwd]
     cPickle.dump(users, fw)  # 重新写入文件
     fw.close()
-    return user_no
+    return str(user_no)
 
 
 # 登录验证

@@ -14,19 +14,15 @@ import login
 import message
 import files
 from logger import logger
-from const import IP, PORT, DGRAM_FORMAT, PID_FILE
+from const import IP, PORT, DGRAM_FORMAT, CMD_FORMAT, PID_FILE
 
 # 解决发送中文异常
 reload(sys)
-sys.setdefaultencoding("utf-8")
-
-
-def _strip(s):
-    return s.strip('\x00')
+sys.setdefaultencoding('utf-8')
 
 
 class Server(Daemon):
-    def __init__(self, pidfile, ip="", port=6677):
+    def __init__(self, pidfile, ip='', port=6677):
         super(Server, self).__init__(pidfile)
         self.ip = ip
         self.port = port
@@ -55,182 +51,172 @@ class Server(Daemon):
                 else:  # connection is created
                     data = s.recv(1024)
                     if data:
-                        logger.debug('recv {} from {}'.format(data,
+                        raw_fields = struct.unpack(DGRAM_FORMAT, data)
+                        fields = [e.strip('\x00') for e in raw_fields]
+                        a, b, c, d = fields
+                        logger.debug('recv {} from {}'.format('#'.join(fields),
                                      s.getpeername()))
-                        a, b, c, d = struct.unpack(DGRAM_FORMAT, data)
-                        a = a.strip("\x00")
+
                         # 注册新用户
                         if a == 'SIGN_IN':
-                            user_no = login.register(_strip(b),
-                                                     _strip(c), _strip(d))
-                            logger.info(u"随机生成一个OC号: {}".format(user_no))
-                            user_no = str(user_no)
-                            msgQueues[s].put(user_no)
-                            friends.addFriend(user_no, user_no)
+                            uid = login.register(b, c, d)
+                            logger.info(u'随机生成一个OC号: {}'.format(uid))
+                            msgQueues[s].put(uid)
+                            friends.addFriend(uid, uid)
 
                         # 登录验证
                         elif a == 'LOGIN':
-                            uno = _strip(b)
-                            reply = login.loginCheck(uno, _strip(c))
+                            uid, pwd = b, c
+                            reply = login.loginCheck(uid, pwd)
                             msgQueues[s].put(reply)
-                            if reply != "LOGIN FAIL":   # 登录成功
-                                self.onlineUser.append(uno)
-                                msg = struct.pack("50s50s50s", "UP", uno, "")
+                            if reply != 'LOGIN FAIL':   # 登录成功
+                                self.onlineUser.append(uid)
+                                msg = struct.pack(CMD_FORMAT, 'UP', uid, '')
                                 for kno in self.cmd_sock:
                                     if self.cmd_sock[kno] in msgQueues:
                                         msgQueues[self.cmd_sock[kno]].put(msg)
 
                         # 客户端下线通知
                         elif a == 'DOWN':
-                            uno = _strip(b)
-                            logger.info(u"{} 下线通知".format(uno))
-                            if uno in self.onlineUser:
-                                self.onlineUser.remove(uno)
-                            if uno in self.sessions:
-                                for fno in self.sessions[uno]:
-                                    usock = self.sessions[uno][fno]
+                            uid = b
+                            logger.info(u'{} 下线通知'.format(uid))
+                            if uid in self.onlineUser:
+                                self.onlineUser.remove(uid)
+                            if uid in self.sessions:
+                                for fid in self.sessions[uid]:
+                                    usock = self.sessions[uid][fid]
                                     if usock:
                                         usock.close()
-                                self.sessions.pop(uno)
+                                self.sessions.pop(uid)
 
-                            sdata = struct.pack("50s50s50s", "DOWN", uno, "")
+                            sdata = struct.pack(CMD_FORMAT, 'DOWN', uid, '')
                             for kno in self.cmd_sock:
                                 if self.cmd_sock[kno] in msgQueues:
                                     msgQueues[self.cmd_sock[kno]].put(sdata)
 
                         # 每个客户端一个cmd socket
                         elif a == 'CMD_SOCKET':
-                            uno = _strip(b)
-                            self.cmd_sock[uno] = s
+                            uid = b
+                            self.cmd_sock[uid] = s
 
-                        # 查找好友列表，返回user_no, nickname
+                        # 查找好友列表，返回uid, nickname
                         elif a == 'GET_FRIENDS':
-                            reply = friends.getFriends(_strip(b))
+                            reply = friends.getFriends(b)
                             msgQueues[s].put(reply)
 
                         # 获取当前在线的所账号
                         elif a == 'GET_ONLINE':
                             ou = '|'.join(self.onlineUser)
-                            reply = "OK|" + ou
-
+                            reply = 'OK|' + ou
                             msgQueues[s].put(reply)
 
                         # 查找好友
                         elif a == 'FIND_FRIEND':
-                            reply = friends.findFriend(_strip(b))
+                            reply = friends.findFriend(b)
                             msgQueues[s].put(reply)
 
                         # 添加好友，双向添加，默认不提示被动添加的一方
                         elif a == 'ADD_FRIEND':
-                            uno = _strip(b)
-                            fno = _strip(c)
+                            uid, fid = b, c
 
-                            reply = friends.addFriend(fno, uno)
-                            reply = friends.addFriend(uno, fno)
+                            reply = friends.addFriend(uid, fid)
                             if reply == 'ADD_SUCCESS':
-                                ret = friends.findFriend(fno)
+                                reply = friends.addFriend(fid, uid)
+                                ret = friends.findFriend(fid)
                                 fnick = ret.split('[')[1].split(']')[0]
-                                state = "OFFLINE"
-                                if fno in self.onlineUser:
+                                state = 'OFFLINE'
+                                if fid in self.onlineUser:
                                     state = 'ONLINE'
 
-                                reply = u"{}|{}|{}".format(fno, fnick, state)
+                                reply = u'{}|{}|{}'.format(fid, fnick, state)
+                                msgQueues[s].put(reply)
+                            else:
                                 msgQueues[s].put(reply)
 
-                        # 查找离线消息，返回send_user_no, msg
+                        # 查找离线消息，返回send_uid, msg
                         elif a == 'OFFLINE_MSG':
-                            uno = _strip(b)
-                            sdata = message.getOfflineMsg(uno)
-                            logger.info(u"离线消息:{}".format(sdata))
+                            uid = b
+                            sdata = message.getOfflineMsg(uid)
+                            logger.info(u'离线消息:{}'.format(sdata))
                             msgQueues[s].put(sdata)
 
                         # 建立会话、或接收会话
                         elif a == 'NEW_SESSION':
-                            user_no = _strip(b)
-                            friend_no = _strip(c)
-                            if user_no not in self.sessions.keys():
-                                self.sessions[user_no] = {}
-                            self.sessions[user_no][friend_no] = s
-                            logger.info("new session between {} and {}".format(
-                                user_no, friend_no))
+                            uid, fid = b, c
+                            if uid not in self.sessions.keys():
+                                self.sessions[uid] = {}
+                            self.sessions[uid][fid] = s
+                            logger.info('new session between {} and {}'.format(uid, fid))
 
                         # 转发消息
                         elif a == 'MESG':
-                            uno = _strip(b)
-                            fno = _strip(c)
-                            msg = _strip(d)
-                            logger.info(u"to {}: {}".format(fno, msg))
-                            if fno not in self.onlineUser:
+                            uid, fid, msg = b, c, d
+                            logger.info(u'to {}: {}'.format(fid, msg))
+                            if fid not in self.onlineUser:
                                 # 写入离线消息文件，并提示
-                                message.saveOfflineMsg(uno, fno, msg)
-                                msg = u"{}处于离线状态!".format(fno)
-                                msgQueues[self.sessions[uno][fno]].put(msg)
+                                message.saveOfflineMsg(uid, fid, msg)
+                                msg = u'{}处于离线状态!'.format(fid)
+                                msgQueues[self.sessions[uid][fid]].put(msg)
                             else:
-                                # 如果fno和uno还没有建立会话，那么先建立socket
-                                if fno not in self.sessions.keys() or \
-                                        uno not in self.sessions[fno].keys():
-                                    fsock = self.cmd_sock[fno]
-                                    logger.info("... cmd socket {} {}".format(
-                                        fno, fsock.getpeername()))
-                                    sdata = struct.pack("50s50s50s",
-                                                        "NEW_SESSION",
-                                                        str(uno),
+                                # 如果fid和uid还没有建立会话，那么先建立socket
+                                if fid not in self.sessions.keys() or \
+                                        uid not in self.sessions[fid].keys():
+                                    fsock = self.cmd_sock[fid]
+                                    logger.info('... cmd socket {} {}'.format(
+                                                fid, fsock.getpeername()))
+                                    sdata = struct.pack(CMD_FORMAT,
+                                                        'NEW_SESSION',
+                                                        str(uid),
                                                         msg)
                                     msgQueues[fsock].put(sdata)
-                                    logger.debug("MESG....deubg")
+                                    logger.debug('MESG....deubg')
                                 else:
-                                    msgQueues[self.sessions[fno][uno]].put(msg)
+                                    msgQueues[self.sessions[fid][uid]].put(msg)
 
-                                message.write2file(uno, fno, msg)
+                                message.write2file(uid, fid, msg)
 
                         # 上传文件
                         elif a == 'UPLOAD':
-                            b = _strip()
-                            if len(b) == 6:
-                                sno = _strip(b)
-                                rno = _strip(c)
-                                fname = _strip(d)
-                                msgQueues[self.sessions[sno][rno]].put(
-                                        u"正在上传...")
+                            if len(b) == 6 and len(c) == 6:  # todo: 区分upload cmd和data
+                                send_uid, recv_uid, filename = b, c, d
+                                msgQueues[self.sessions[send_uid][recv_uid]].\
+                                    put(u'正在上传...')
 
-                                msgQueues[s].put("RECV_NOTICE")
-                                files.recordFileInfo(sno, rno, fname)
+                                msgQueues[s].put('RECV_NOTICE')
+                                files.recordFileInfo(send_uid, recv_uid, filename)
                             else:
-                                dlen = string.atoi(b)
-                                fname = _strip(c)
-                                cont = d
-                                files.write2file(fname, cont[0:dlen])
-                                msgQueues[s].put("RECV_OK")
+                                datalen = string.atoi(b)
+                                filename, content = c, raw_fields[-1]
+                                files.write2file(filename, content[0:datalen])
+                                msgQueues[s].put('RECV_OK')
 
                         # 上传完成
                         elif a == 'UPLOAD_FINISH':
-                            sno = _strip(b)
-                            rno = _strip(c)
-                            fname = _strip(d)
-                            if rno in self.sessions and \
-                                    sno in self.sessions[rno]:
-                                sdata = u"FILE\r\n{}|{}".format(sno, fname)
-                                msgQueues[self.sessions[rno][sno]].put(sdata)
-                            elif rno in self.onlineUser:
-                                fsock = self.cmd_sock[rno]
-                                logger.info("... cmd socket {} {}".format(
-                                    rno, fsock.getpeername()))
-                                msg = u"{}正在向你传送文件:{}".format(sno, fname)
-                                sdata = struct.pack("50s50s50s", "NEW_SESSION",
-                                                    str(sno), str(msg))
+                            send_uid, recv_uid, filename = b, c, d
+
+                            if recv_uid in self.sessions and \
+                                    send_uid in self.sessions[recv_uid]:
+                                sdata = u'FILE\r\n{}|{}'.format(send_uid, filename)
+                                msgQueues[self.sessions[recv_uid][send_uid]].put(sdata)
+                            elif recv_uid in self.onlineUser:
+                                fsock = self.cmd_sock[recv_uid]
+                                logger.info('... cmd socket {} {}'.format(
+                                            recv_uid, fsock.getpeername()))
+                                msg = u'{}正在向你传送文件:{}'.format(send_uid, filename)
+                                sdata = struct.pack(CMD_FORMAT, 'NEW_SESSION',
+                                                    send_uid, str(msg))
                                 msgQueues[fsock].put(sdata)
-                                logger.debug("FILE....deubg")
+                                logger.debug('FILE....deubg')
 
                         # 可以下载的离线文件
                         elif a == 'DOWN_FILE_NAME':
-                            fnames = files.getFileLists(_strip(b), _strip(c))
-                            msgQueues[s].put(fnames)
+                            fs = files.getFileLists(b, c)
+                            msgQueues[s].put(fs)
                         elif a == 'DOWNLOAD':
-                            fname = _strip(b)
-                            recvd_bytes = string.atoi(d.strip('\x00'))
-                            if _strip(c) == "RECV_OK":
-                                rdata = files.getFileContent(
-                                        fname, recvd_bytes, 1024)
+                            filename, status, size = b, c, d
+                            recvd_bytes = string.atoi(size)
+                            if status == 'RECV_OK':
+                                rdata = files.getFileContent(filename, recvd_bytes, 1024)
                                 if len(rdata) < 1:
                                     rdata = 'FILE_END\r\n'
                                 msgQueues[s].put(rdata)
@@ -238,7 +224,7 @@ class Server(Daemon):
                         if s not in outputs:
                             outputs.append(s)
                     else:   # data is None
-                        logger.info(u"关闭socket: {}".format(s.getpeername()))
+                        logger.info(u'关闭socket: {}'.format(s.getpeername()))
                         if s in outputs:
                             outputs.remove(s)
                         for k1 in self.sessions.keys():
@@ -260,18 +246,12 @@ class Server(Daemon):
                     pass
 
             for s in exceptional:
-                logger.error("exceptional condition on {}".format(
-                    s.getpeername()))
+                logger.error('exceptional condition on {}'.format(s.getpeername()))
                 inputs.remove(s)
                 if s in outputs:
                     outputs.remove(s)
                 s.close()
                 del msgQueues[s]
-
-    # def stop(self):
-    #     self.runFlag = 0
-    #     if self.sock:
-    #         self.sock.close()
 
     def newSocket(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -282,23 +262,20 @@ class Server(Daemon):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-                description='pychat server')
+    parser = argparse.ArgumentParser(description='pychat server')
     parser.add_argument('--action', dest='action', default='start',
                         help='start/stop (default: %(default)s)')
     parser.add_argument('--pidfile', dest='pidfile',
                         default=PID_FILE,
                         help='pidfile (default: %(default)s)')
-    parser.add_argument('--ip', dest='ip', default=IP,
-                        help='ip (default: %(default)s)')
-    parser.add_argument('--port', dest='port', default=PORT,
-                        help='port (default: %(default)s)')
     args = parser.parse_args()
 
-    s = Server(args.pidfile, args.ip, args.port)
+    s = Server(args.pidfile, IP, PORT)
     if args.action == 'start':
+        logger.info('server is starting')
         s.start()
     elif args.action == 'stop':
         s.stop()
+        logger.info('server is stopped')
     else:
-        raise Exception("arguments error")
+        raise Exception('arguments error')

@@ -2,10 +2,7 @@
 
 import cPickle
 import time
-
-
-history_msg_file = "msg\\history.pk"
-offline_msg_file = "msg\\offline.pk"
+from const import history_msg_file, offline_msg_file
 
 
 def curTime():

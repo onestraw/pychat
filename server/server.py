@@ -13,15 +13,12 @@ import friends
 import login
 import message
 import files
+from logger import logger
+from const import IP, PORT, DGRAM_FORMAT, PID_FILE
 
 # 解决发送中文异常
 reload(sys)
 sys.setdefaultencoding("utf-8")
-
-
-IP = "127.0.0.1"
-PORT = 6677
-DGRAM_FORMAT = "50s50s50s200s"
 
 
 def _strip(s):
@@ -52,20 +49,21 @@ class Server(Daemon):
                 if s is self.sock:
                     conn, cli_addr = s.accept()
                     conn.setblocking(0)
-                    print('connection from {}'.format(cli_addr))
+                    logger.info('connection from {}'.format(cli_addr))
                     inputs.append(conn)
                     msgQueues[conn] = Queue.Queue()
                 else:  # connection is created
                     data = s.recv(1024)
                     if data:
-                        print('recv {} from {}'.format(data, s.getpeername()))
+                        logger.debug('recv {} from {}'.format(data,
+                                     s.getpeername()))
                         a, b, c, d = struct.unpack(DGRAM_FORMAT, data)
                         a = a.strip("\x00")
                         # 注册新用户
                         if a == 'SIGN_IN':
                             user_no = login.register(_strip(b),
                                                      _strip(c), _strip(d))
-                            print(u"随机生成一个OC号: {}".format(user_no))
+                            logger.info(u"随机生成一个OC号: {}".format(user_no))
                             user_no = str(user_no)
                             msgQueues[s].put(user_no)
                             friends.addFriend(user_no, user_no)
@@ -85,7 +83,7 @@ class Server(Daemon):
                         # 客户端下线通知
                         elif a == 'DOWN':
                             uno = _strip(b)
-                            print(u"%s下线通知{}".format(uno))
+                            logger.info(u"{} 下线通知".format(uno))
                             if uno in self.onlineUser:
                                 self.onlineUser.remove(uno)
                             if uno in self.sessions:
@@ -113,7 +111,7 @@ class Server(Daemon):
                         # 获取当前在线的所账号
                         elif a == 'GET_ONLINE':
                             ou = '|'.join(self.onlineUser)
-                            reply = "OK" + ou
+                            reply = "OK|" + ou
 
                             msgQueues[s].put(reply)
 
@@ -143,7 +141,7 @@ class Server(Daemon):
                         elif a == 'OFFLINE_MSG':
                             uno = _strip(b)
                             sdata = message.getOfflineMsg(uno)
-                            print(u"离线消息:{}".format(sdata))
+                            logger.info(u"离线消息:{}".format(sdata))
                             msgQueues[s].put(sdata)
 
                         # 建立会话、或接收会话
@@ -153,7 +151,7 @@ class Server(Daemon):
                             if user_no not in self.sessions.keys():
                                 self.sessions[user_no] = {}
                             self.sessions[user_no][friend_no] = s
-                            print("new session between {} and {}".format(
+                            logger.info("new session between {} and {}".format(
                                 user_no, friend_no))
 
                         # 转发消息
@@ -161,7 +159,7 @@ class Server(Daemon):
                             uno = _strip(b)
                             fno = _strip(c)
                             msg = _strip(d)
-                            print(u"to {}: {}".format(fno, msg))
+                            logger.info(u"to {}: {}".format(fno, msg))
                             if fno not in self.onlineUser:
                                 # 写入离线消息文件，并提示
                                 message.saveOfflineMsg(uno, fno, msg)
@@ -172,14 +170,14 @@ class Server(Daemon):
                                 if fno not in self.sessions.keys() or \
                                         uno not in self.sessions[fno].keys():
                                     fsock = self.cmd_sock[fno]
-                                    print("... cmd socket {} {}".format(
+                                    logger.info("... cmd socket {} {}".format(
                                         fno, fsock.getpeername()))
                                     sdata = struct.pack("50s50s50s",
                                                         "NEW_SESSION",
                                                         str(uno),
                                                         msg)
                                     msgQueues[fsock].put(sdata)
-                                    print("MESG....deubg")
+                                    logger.debug("MESG....deubg")
                                 else:
                                     msgQueues[self.sessions[fno][uno]].put(msg)
 
@@ -215,13 +213,13 @@ class Server(Daemon):
                                 msgQueues[self.sessions[rno][sno]].put(sdata)
                             elif rno in self.onlineUser:
                                 fsock = self.cmd_sock[rno]
-                                print("... cmd socket {} {}".format(
+                                logger.info("... cmd socket {} {}".format(
                                     rno, fsock.getpeername()))
                                 msg = u"{}正在向你传送文件:{}".format(sno, fname)
                                 sdata = struct.pack("50s50s50s", "NEW_SESSION",
                                                     str(sno), str(msg))
                                 msgQueues[fsock].put(sdata)
-                                print("FILE....deubg")
+                                logger.debug("FILE....deubg")
 
                         # 可以下载的离线文件
                         elif a == 'DOWN_FILE_NAME':
@@ -240,7 +238,7 @@ class Server(Daemon):
                         if s not in outputs:
                             outputs.append(s)
                     else:   # data is None
-                        print(u"关闭socket: ", s.getpeername())
+                        logger.info(u"关闭socket: {}".format(s.getpeername()))
                         if s in outputs:
                             outputs.remove(s)
                         for k1 in self.sessions.keys():
@@ -262,7 +260,8 @@ class Server(Daemon):
                     pass
 
             for s in exceptional:
-                print("exceptional condition on {}".format(s.getpeername()))
+                logger.error("exceptional condition on {}".format(
+                    s.getpeername()))
                 inputs.remove(s)
                 if s in outputs:
                     outputs.remove(s)
@@ -288,7 +287,7 @@ if __name__ == '__main__':
     parser.add_argument('--action', dest='action', default='start',
                         help='start/stop (default: %(default)s)')
     parser.add_argument('--pidfile', dest='pidfile',
-                        default='/var/run/pychat_server.pid',
+                        default=PID_FILE,
                         help='pidfile (default: %(default)s)')
     parser.add_argument('--ip', dest='ip', default=IP,
                         help='ip (default: %(default)s)')

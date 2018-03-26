@@ -2,9 +2,7 @@
 
 import cPickle
 import string
-
-user_file = "user\\user.pk"
-friend_file = "user\\friends.pk"
+from const import user_file, friend_file
 
 
 def addFriend(user_no, friend_no):

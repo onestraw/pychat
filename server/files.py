@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import os
 import time
+from const import FILE_PATH, file_info
 
 
-file_info = "file\\file_info.txt"
-file_dir = "file\\"
+def file_path(fname):
+    return os.path.join(FILE_PATH, fname)
 
 
 def curTime():
@@ -19,7 +21,7 @@ def recordFileInfo(sno, rno, fname):
 
 
 def write2file(fname, cont):
-    fw = open(file_dir+fname, "ab")
+    fw = open(file_path(fname), "ab")
     fw.write(cont)
     fw.close()
 
@@ -41,7 +43,7 @@ def getFileLists(sno, rno):
 
 
 def getFileContent(fname, recvd_bytes, read_bytes):
-    fr = open(file_dir+fname, "rb")
+    fr = open(file_path(fname), "rb")
     fr.seek(recvd_bytes)
     rdata = fr.read(read_bytes)
     fr.close()

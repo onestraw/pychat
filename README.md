@@ -12,9 +12,13 @@ pychat is a C/S structure chat tool with friendly UI.It supports
 - online/offline remind
 
 ## Todo
+- package with pyinstaller, the binary failed to execute
 - create pyqt4 dev/install script
-- package with pyinstaller
-- add travis ci
+- travis ci
+- client side history
+- chatroom
+- test
+- documentation
 
 ## Dev
 

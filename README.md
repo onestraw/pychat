@@ -1,5 +1,8 @@
 # pychat
 
+## [中文设计文档](./README_CN.md)
+当年的课程报告，仅作为初学者的参考资料.
+
 ## Introduction
 pychat is a C/S structure chat tool with friendly UI.It supports
 
